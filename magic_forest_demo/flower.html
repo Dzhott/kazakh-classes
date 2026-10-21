@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сиқырлы орман — Достық гүлі</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="scene quiz-scene">
+  <div class="card wide">
+    <div class="emoji">🌸💗</div>
+    <p class="eyebrow">4-БӨЛІМ · ДОСТЫҚ ГҮЛІ</p>
+    <p>Мейірімді жауаптарды таңдап, достық гүлін аш!</p>
+    <div id="progress" class="progress">1 / 3 сұрақ</div>
+    <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+    <h1 id="question"></h1>
+    <div id="answers" class="answers"></div>
+    <p id="feedback" class="feedback" aria-live="polite">Дұрыс жауапты таңда!</p>
+    <div class="actions">
+      <a class="back" href="map.html">← Картаға қайту</a>
+      <button id="next" class="button" disabled>Келесі →</button>
+    </div>
+  </div>
+</main>
+<script>
+const questions = [{"q": "Досың көңілсіз болса, не істеген дұрыс?", "a": ["Мазақ ету", "Тыңдап, қолдау көрсету", "Оны жалғыз қалдырып күлу"], "correct": 1}, {"q": "Бірге ойнағанда ойыншықты қалай қолданамыз?", "a": ["Кезекпен бөлісеміз", "Ешкімге бермейміз", "Жасырып қоямыз"], "correct": 0}, {"q": "Егер байқамай досыңды ренжітсең, не істейсің?", "a": ["Кешірім сұраймын", "Оны кінәлаймын", "Елемеймін"], "correct": 0}];
+const finishMessage = "Достық гүлі жайқалды!";
+let current = 0, answered = false, score = 0;
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const feedbackEl = document.getElementById("feedback");
+const progressEl = document.getElementById("progress");
+const progressFill = document.getElementById("progressFill");
+const nextBtn = document.getElementById("next");
+
+function render() {
+  answered = false;
+  const item = questions[current];
+  progressEl.textContent = `${current + 1} / ${questions.length} сұрақ`;
+  progressFill.style.width = `${((current + 1) / questions.length) * 100}%`;
+  questionEl.textContent = item.q;
+  feedbackEl.textContent = "Дұрыс жауапты таңда!";
+  feedbackEl.className = "feedback";
+  answersEl.innerHTML = "";
+  nextBtn.disabled = true;
+  nextBtn.textContent = current === questions.length - 1 ? "Нәтиже →" : "Келесі →";
+  item.a.forEach((answer, index) => {
+    const button = document.createElement("button");
+    button.className = "answer";
+    button.textContent = answer;
+    button.onclick = () => choose(index, button);
+    answersEl.appendChild(button);
+  });
+}
+function choose(index, button) {
+  if (answered) return;
+  answered = true;
+  const item = questions[current];
+  [...answersEl.children].forEach((b, i) => {
+    b.disabled = true;
+    if (i === item.correct) b.classList.add("correct");
+  });
+  if (index === item.correct) {
+    score++;
+    feedbackEl.textContent = "Дұрыс! Сиқырлы орман саған қуанып тұр ✨";
+    feedbackEl.className = "feedback good";
+  } else {
+    button.classList.add("wrong");
+    feedbackEl.textContent = "Жақсы талпыныс! Дұрыс жауап жасыл түспен көрсетілді.";
+    feedbackEl.className = "feedback bad";
+  }
+  nextBtn.disabled = false;
+}
+nextBtn.onclick = () => {
+  if (current < questions.length - 1) {
+    current++;
+    render();
+  } else {
+    questionEl.textContent = "Жарайсың!";
+    progressEl.textContent = "Сынақ аяқталды";
+    progressFill.style.width = "100%";
+    answersEl.innerHTML = `<div class="finish">🌸💗<br>${finishMessage}<br><span style="display:inline-block;margin-top:10px;font-size:18px;color:#846a20">Сенің нәтижең: ${score} / ${questions.length}</span></div>`;
+    feedbackEl.textContent = "Картаға оралып, басқа сынақты таңда!";
+    feedbackEl.className = "feedback good";
+    nextBtn.textContent = "Картаға оралу";
+    nextBtn.onclick = () => location.href = "map.html";
+  }
+};
+render();
+</script>
+</body>
+</html>
